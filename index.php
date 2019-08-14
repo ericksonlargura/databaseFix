@@ -124,8 +124,8 @@ session_start();
 										<option value="2">RG (CADASTRO_PACIENTE.REGPAC)</option>
 										<option value="3">CPF (CADASTRO_PACIENTE.CPFPAC)</option>
 										<option value="4">Localizar duplicados (CODPAC, CODPRO, CODLAM)</option>
-										<option value="5">Corrigir CODPAC duplicado</option>
-										<option value="6">Corrigir CODPRO</option>
+										<option value="5" disabled>Corrigir CODPAC duplicado</option>
+										<option value="6" disabled>Corrigir CODPRO</option>
 										<option value="7">Alterações na estrutura</option>
 										<option value="99">Rollback (Necessário configurar no php)</option>
 									</select>

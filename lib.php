@@ -264,54 +264,54 @@ class dao {
 
 	}
   
-	function fixUserId($new, $old){
+	// function fixUserId($new, $old){
 
-		$con = new connection();
-		$data = new ArrayObject();
-		$logs = new logs();
-		$sql = "";
+	// 	$con = new connection();
+	// 	$data = new ArrayObject();
+	// 	$logs = new logs();
+	// 	$sql = "";
 		
-		$sql = "SELECT * FROM CADASTRO_PACIENTE WHERE CODPAC = '$old'; ";
-		$data->append($con->connect($this->server, $this->database, $this->user, $this->pass, $sql));
-		$logs->saveLog("CODPAC DESCARTADO", json_encode($data));
+	// 	$sql = "SELECT * FROM CADASTRO_PACIENTE WHERE CODPAC = '$old'; ";
+	// 	$data->append($con->connect($this->server, $this->database, $this->user, $this->pass, $sql));
+	// 	$logs->saveLog("CODPAC DESCARTADO", json_encode($data));
 
-		$sql = "UPDATE BIOPSIA SET CODPAC = '$new' WHERE CODPAC = '$old'; ";
-		$sql = $sql . "UPDATE BIOPSIA_RESULTADO SET CODPAC = '$new' WHERE CODPAC = '$old'; ";
-		$sql = $sql . "UPDATE EVOLUCAO SET CODPAC = '$new' WHERE CODPAC = '$old'; ";
-		$sql = $sql . "UPDATE EVOLUCAO_RESULTADO SET CODPAC = '$new' WHERE CODPAC = '$old'; ";
-		$sql = $sql . "UPDATE EXAME_COLO_VAGINA SET CODPAC = '$new' WHERE CODPAC = '$old'; ";
-		$sql = $sql . "UPDATE EXAME_COLPOCITOLOGIA SET CODPAC = '$new' WHERE CODPAC = '$old'; ";
-		$sql = $sql . "UPDATE EXAME_MAMA SET CODPAC = '$new' WHERE CODPAC = '$old'; ";
-		$sql = $sql . "UPDATE PROTUARIO_PACIENTE SET CODPAC = '$new' WHERE CODPAC = '$old'; ";
-		$sql = $sql . "DELETE FROM CADASTRO_PACIENTE WHERE CODPAC = '$old';";
-		$con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
-		return "ok";
+	// 	$sql = "UPDATE BIOPSIA SET CODPAC = '$new' WHERE CODPAC = '$old'; ";
+	// 	$sql = $sql . "UPDATE BIOPSIA_RESULTADO SET CODPAC = '$new' WHERE CODPAC = '$old'; ";
+	// 	$sql = $sql . "UPDATE EVOLUCAO SET CODPAC = '$new' WHERE CODPAC = '$old'; ";
+	// 	$sql = $sql . "UPDATE EVOLUCAO_RESULTADO SET CODPAC = '$new' WHERE CODPAC = '$old'; ";
+	// 	$sql = $sql . "UPDATE EXAME_COLO_VAGINA SET CODPAC = '$new' WHERE CODPAC = '$old'; ";
+	// 	$sql = $sql . "UPDATE EXAME_COLPOCITOLOGIA SET CODPAC = '$new' WHERE CODPAC = '$old'; ";
+	// 	$sql = $sql . "UPDATE EXAME_MAMA SET CODPAC = '$new' WHERE CODPAC = '$old'; ";
+	// 	$sql = $sql . "UPDATE PROTUARIO_PACIENTE SET CODPAC = '$new' WHERE CODPAC = '$old'; ";
+	// 	$sql = $sql . "DELETE FROM CADASTRO_PACIENTE WHERE CODPAC = '$old';";
+	// 	$con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
+	// 	return "ok";
 
-	}
+	// }
 
-	function fixRecordId($old){
+	// function fixRecordId($old){
 
-		$con = new connection();
-		$data = new ArrayObject();
-		$logs = new logs();
-		$sql = "";
+	// 	$con = new connection();
+	// 	$data = new ArrayObject();
+	// 	$logs = new logs();
+	// 	$sql = "";
 
-		$sql = "SELECT * FROM PROTUARIO_PACIENTE WHERE CODPRO = '$old'; ";
-		$data->append($con->connect($this->server, $this->database, $this->user, $this->pass, $sql));
-		$logs->saveLog("CODPRO DESCARTADO", json_encode($data));
+	// 	$sql = "SELECT * FROM PROTUARIO_PACIENTE WHERE CODPRO = '$old'; ";
+	// 	$data->append($con->connect($this->server, $this->database, $this->user, $this->pass, $sql));
+	// 	$logs->saveLog("CODPRO DESCARTADO", json_encode($data));
 
-		$sql = "SELECT TOP 1 CODPRO FROM PROTUARIO_PACIENTE ORDER BY CODPRO DESC";
-		$new = $con->connect($this->server, $this->database, $this->user, $this->pass, $sql)[0]["CODPRO"] + 1;
+	// 	$sql = "SELECT TOP 1 CODPRO FROM PROTUARIO_PACIENTE ORDER BY CODPRO DESC";
+	// 	$new = $con->connect($this->server, $this->database, $this->user, $this->pass, $sql)[0]["CODPRO"] + 1;
 
-		$sql = "UPDATE PROTUARIO_PACIENTE SET CODPRO = '$new' WHERE CODPRO = '$old'; ";
-		$sql = $sql . "UPDATE ID_LAMINA SET CODPRO = '$new' WHERE CODPRO = '$old'; ";
-		$sql = $sql . "UPDATE EXAME_COLO_VAGINA SET CODPRO = '$new' WHERE CODPRO = '$old'; ";
-		$sql = $sql . "UPDATE EXAME_COLPOCITOLOGIA SET CODPRO = '$new' WHERE CODPRO = '$old'; ";
-		$sql = $sql . "UPDATE EXAME_MAMA SET CODPRO = '$new' WHERE CODPRO = '$old'; ";
-		$con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
-		return "ok";
+	// 	$sql = "UPDATE PROTUARIO_PACIENTE SET CODPRO = '$new' WHERE CODPRO = '$old'; ";
+	// 	$sql = $sql . "UPDATE ID_LAMINA SET CODPRO = '$new' WHERE CODPRO = '$old'; ";
+	// 	$sql = $sql . "UPDATE EXAME_COLO_VAGINA SET CODPRO = '$new' WHERE CODPRO = '$old'; ";
+	// 	$sql = $sql . "UPDATE EXAME_COLPOCITOLOGIA SET CODPRO = '$new' WHERE CODPRO = '$old'; ";
+	// 	$sql = $sql . "UPDATE EXAME_MAMA SET CODPRO = '$new' WHERE CODPRO = '$old'; ";
+	// 	$con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
+	// 	return "ok";
 
-	}
+	// }
 
 	function databaseStructure($val){
 
