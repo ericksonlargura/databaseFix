@@ -354,13 +354,15 @@ class dao {
 		$data = explode(",", $content);
 
 		for($i = 0; count($data) > $i; $i++){
-			$val = $data[$i];
-			$aux++;
-			$sql = $sql . "INSERT INTO CIDADE VALUES ('$val'); ";
-			if($aux > 20){
-				$aux = 0;
-				$con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
-				$sql = "";
+			$val = str_replace('"',"",str_replace("(","",str_replace(")","",$data[$i])));
+			if(strlen($val) > 0){
+				$aux++;
+				$sql = $sql . "INSERT INTO CIDADE VALUES ('$val'); ";
+				if($aux > 20){
+					$aux = 0;
+					$con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
+					$sql = "";
+				}
 			}
 		}
 
