@@ -52,6 +52,12 @@ if ($_POST['verify'] == 0) { //Tela inicial
 			$_SESSION['page'] = 0;
 			$_SESSION['alert'] = "Banco de dados atualizado!";
 
+		} else if ($_SESSION['type'] == 8) {
+	
+			$dao->insertCities();
+			$_SESSION['page'] = 0;
+			$_SESSION['alert'] = "Banco de dados atualizado!";
+
 		} else if ($_SESSION['type'] == 99) {
 	
 			$dao->rollbackQuery();

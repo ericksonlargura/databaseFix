@@ -318,8 +318,8 @@ class dao {
 		$con = new connection();
 
 		$cont = array(
-			"CREATE TABLE CIDADE (CODCID varchar(50),NOMCID varchar(50)); ",
-			"CREATE TABLE BAIRROS (CODBAI int,CODCID int null,NOMBAI varchar(50)); ",
+			"CREATE TABLE CIDADE (CODCID int IDENTITY(1,1) PRIMARY KEY,NOMCID varchar(50)); ",
+			"CREATE TABLE BAIRROS (CODBAI int IDENTITY(1,1) PRIMARY KEY,CODCID int null,NOMBAI varchar(50)); ",
 			"CREATE TABLE MOVIMENTO_FINANCEIRO (COD_MOV int NOT NULL PRIMARY KEY,COD_LAN int,STA_LAN varchar(255),USUALT varchar(255),DATALT varchar(255),TIPMOV varchar(255),VLRLAN varchar(255),VLRDES varchar(255),VLRMUL varchar(255),VLRJUR varchar(255),VLRTOT varchar(255),SEQMOV varchar(255),TIPLAN varchar(255),SEQTIT varchar(255)); ",
 			"CREATE TABLE AGENDA (CODAGE int NOT NULL PRIMARY KEY,DATINI varchar(255),DATFIM varchar(255),CODPAC varchar(255),NOMPAC varchar(255),CONPAC varchar(255),STATUS varchar(255),TIPAGE varchar(255)); ",
 			"CREATE TABLE ESTOQUE (CODEMP int NOT NULL,CODFIL int NOT NULL,CODDEP varchar(50) NOT NULL,CODPRO varchar(50) NOT NULL,CODEST INT NOT NULL IDENTITY(1,1),DESPRO varchar(250) NULL,QTDEST decimal(18, 5) NULL,UNIMED varchar(50) NULL,VLRCOM decimal(18, 2) NULL,VLRVEN decimal(18, 2) NULL,VLRTCO decimal(18, 2) NULL,VLRTVE decimal(18, 2) NULL,CODAGR int NULL,SITPRO varchar(1) NOT NULL, PRIMARY KEY(CODEMP,CODFIL,CODDEP,CODPRO,CODEST)); ",
@@ -336,6 +336,81 @@ class dao {
 		for($i = 0; count($val) > $i; $i++){
 			$con->connect($this->server, $this->database, $this->user, $this->pass, $cont[$val[$i]]);
 		}
+
+		return "ok";
+
+	}
+
+	function insertCities(){
+
+		$con = new connection();
+		$sql = "";
+		$aux = 0;
+
+		$file = fopen("log/cities.txt", "r") or die("Unable to open file!");
+		$content = fread($file,filesize("log/cities.txt"));
+		fclose($file);
+
+		$data = explode(",", $content);
+
+		for($i = 0; count($data) > $i; $i++){
+			$val = str_replace('"',"",str_replace("(","",str_replace(")","",$data[$i])));
+			if(strlen($val) > 0){
+				$aux++;
+				$sql = $sql . "INSERT INTO CIDADE VALUES ('$val'); ";
+				if($aux > 20){
+					$aux = 0;
+					$con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
+					$sql = "";
+				}
+			}
+		}
+
+		$con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
+
+		$this->insertNeighbors();
+
+		return "ok";
+
+	}
+
+	function insertNeighbors(){
+
+		$con = new connection();
+		$sql = "";
+		$old = "";
+		$id = 0;
+
+		$file = fopen("log/neighbors.txt", "r") or die("Unable to open file!");
+		$content = fread($file,filesize("log/neighbors.txt"));
+		fclose($file);
+
+		$data = explode("),", $content);
+
+		for($i = 0; count($data) > $i; $i++){
+
+			$city = explode(",",$data[$i])[0];
+			$neig = explode(",",$data[$i])[1];
+
+			if($old == "" || $old != $city){
+				if($old == ""){
+					$id = $con->connect($this->server, $this->database, $this->user, $this->pass, "SELECT CODCID FROM CIDADE WHERE NOMCID = '$city';")[0]['CODCID'];
+					$sql = "INSERT INTO BAIRROS VALUES ($id, '$neig'); ";
+				} else{
+					$con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
+					$id = $con->connect($this->server, $this->database, $this->user, $this->pass, "SELECT CODCID FROM CIDADE WHERE NOMCID = '$city';")[0]['CODCID'];
+					$sql = "";
+					$sql = "INSERT INTO BAIRROS VALUES ($id, '$neig'); ";
+				}
+			} else {
+				$sql = $sql . "INSERT INTO BAIRROS VALUES ($id, '$neig'); ";
+			}
+
+			$old = $city;
+
+		}
+
+		$con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
 
 		return "ok";
 
