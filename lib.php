@@ -109,7 +109,7 @@ class dao {
 			$counter = 0;
 			$newValue = "";
 			
-			$aux = str_replace(',','',str_replace('.','',str_replace('-','',$val['REGPAC'])));
+			$aux = str_replace("'",'',str_replace('"','',str_replace(',','',str_replace('.','',str_replace('-','',$val['REGPAC'])))));
 
 			if(strlen($aux) > 6){
 				
