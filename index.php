@@ -275,6 +275,14 @@ session_start();
 												<input name="checkb[]" value="12" type="checkbox">
 											</div>
 										</div>
+										<input type="text" class="form-control" value="Adicionar tabela CONTA_BANCARIA" disabled>
+									</div>
+									<div class="col input-group mb-3 checkboxes" hidden>
+										<div class="input-group-prepend">
+											<div class="input-group-text">
+												<input name="checkb[]" value="13" type="checkbox">
+											</div>
+										</div>
 										<input type="text" class="form-control" value="Alterações de tabela" disabled>
 									</div>
 								</div>
