@@ -285,14 +285,6 @@ session_start();
 										</div>
 										<input type="text" class="form-control" value="Alterações de tabela" disabled>
 									</div>
-									<div class="col input-group mb-3 checkboxes" hidden>
-										<div class="input-group-prepend">
-											<div class="input-group-text">
-												<input name="checkb[]" value="14" type="checkbox">
-											</div>
-										</div>
-										<input type="text" class="form-control" value="Alterar Idioma" disabled>
-									</div>
 								</div>
 
 								<div class="input-group mb-3 old-pro" hidden>
