@@ -109,7 +109,9 @@ class dao {
 			$counter = 0;
 			$newValue = "";
 			
-			$aux = str_replace("'",'',str_replace('"','',str_replace(',','',str_replace('.','',str_replace('-','',$val['REGPAC'])))));
+			$breaks = array("'", '"', ",", ".", "-");
+
+			$aux = str_replace($breaks,'',$val['REGPAC']);
 
 			if(strlen($aux) > 6){
 				
@@ -127,9 +129,9 @@ class dao {
 			}
 
 			if($x < 4){
-				$newValue = substr($aux, 0, strlen($aux));
+				$newValue = preg_replace("/[^0-9,.]/", "", substr($aux, 0, strlen($aux)));
 			} else {
-				$newValue = substr($aux, $x-3, strlen($aux));
+				$newValue = preg_replace("/[^0-9,.]/", "", substr($aux, $x-3, strlen($aux)));
 			}
 
 			$data->append(array("old"=>$val["REGPAC"], "new"=>$newValue));
