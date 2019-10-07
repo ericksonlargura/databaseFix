@@ -128,6 +128,7 @@ session_start();
 										<option value="6" disabled>Corrigir CODPRO</option>
 										<option value="7">Alterações na estrutura</option>
 										<option value="8">Adicionar CIDADES e BAIRROS no banco</option>
+										<option value="9">Mover imagens de IMAGENS_PRONTUARIO para EVOLUCAO</option>
 										<option value="99">Rollback (Necessário configurar no php)</option>
 									</select>
 								</div>

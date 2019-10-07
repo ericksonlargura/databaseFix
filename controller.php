@@ -52,6 +52,11 @@ if ($_POST['verify'] == 0) { //Tela inicial
 				$_SESSION['page'] = 0;
 				$_SESSION['alert'] = "Banco de dados atualizado!";
 				break;
+			case 9:
+				$dao->moveImageNames();
+				$_SESSION['page'] = 0;
+				$_SESSION['alert'] = "Banco de dados atualizado!";
+				break;
 			case 99:
 				$dao->rollbackQuery();
 				$_SESSION['page'] = 0;
