@@ -450,6 +450,66 @@ class dao {
 
 	}
 
+	function fixDuplicateSheets(){
+
+		set_time_limit(10000);
+
+		$con = new connection();
+		$logs = new logs();
+		$data = new ArrayObject();
+		$last = new ArrayObject();
+		$content = new ArrayObject();
+
+		$sql = "";
+		$lamPre = 0;
+		$lamSuf = 0;
+		$newValue = "";
+		$lastValue = 0;
+		$index = 0;
+
+		$sql = "SELECT a.CODPRO, a.RCITO_LAM 
+		FROM PROTUARIO_PACIENTE a
+		JOIN (SELECT RCITO_LAM, COUNT(*) AS QNT
+		FROM PROTUARIO_PACIENTE 
+		WHERE RCITO_LAM IS NOT NULL 
+		AND LEN(RCITO_LAM) > 0 
+		GROUP BY RCITO_LAM
+		HAVING count(*) > 1) b
+		ON a.RCITO_LAM = b.RCITO_LAM
+		ORDER BY a.CODPRO";
+		$data = $con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
+
+		$sql = "SELECT TOP 1 RCITO_LAM FROM PROTUARIO_PACIENTE ORDER BY CODPRO DESC;";
+		$last = $con->connect($this->server, $this->database, $this->user, $this->pass, $sql)[0];
+		$lamPre = substr($last["RCITO_LAM"], 0, 3);
+		$lamSuf = substr($last["RCITO_LAM"], 3, strlen($last["RCITO_LAM"]));
+
+		$sql = "";
+
+		foreach ($data as $val) {
+			if ($val["RCITO_LAM"] == $lastValue) {
+				$index++;
+				$lamSuf++;
+				$newValue = $lamPre . str_pad($lamSuf, 4, "0", STR_PAD_LEFT);
+				$content->append(array("old"=>$val, "new"=>$newValue));
+				$sql = $sql . "UPDATE PROTUARIO_PACIENTE SET RCITO_LAM = '$newValue' WHERE CODPRO = " . $val["CODPRO"] . "; ";
+				if ($index > 300) {
+					$con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
+					$sql = "";
+					$index = 0;
+				}
+			} else {
+				$lastValue = $val["RCITO_LAM"];
+			}
+		}
+		$con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
+
+		$logs->saveLog("RCITO_LAM DUPLICADO", json_encode($content));
+
+		return "ok";
+
+	}
+
 	function rollbackQuery(){
 
 		set_time_limit(10000);
