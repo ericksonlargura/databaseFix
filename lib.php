@@ -495,7 +495,11 @@ class dao {
 				if ($valid != substr($val["RCITO_LAM"], 0, 3)) {
 					for ($i = 0; count($comp) > $i; $i++) {
 						if (substr($val["RCITO_LAM"], 0, 3) === substr($comp[$i]["RCITO_LAM"], 0, 3)) {
-							if (
+							if (empty($comp[$i+1])) {
+								$numb = (int)substr($comp[$i]["RCITO_LAM"], 3, strlen($comp[$i]["RCITO_LAM"]));
+								$numb++;
+								$newValue = substr($val["RCITO_LAM"], 0, 3) . str_pad($numb, 4, "0", STR_PAD_LEFT);
+							} else if (
 								(int)substr($comp[$i]["RCITO_LAM"], 3, strlen($comp[$i]["RCITO_LAM"])) + 1 != (int)substr($comp[$i+1]["RCITO_LAM"], 3, strlen($comp[$i+1]["RCITO_LAM"]))
 								&& (int)substr($comp[$i]["RCITO_LAM"], 3, strlen($comp[$i]["RCITO_LAM"])) != (int)substr($comp[$i+1]["RCITO_LAM"], 3, strlen($comp[$i+1]["RCITO_LAM"]))
 							) {
