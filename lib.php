@@ -477,10 +477,10 @@ class dao {
 		GROUP BY RCITO_LAM
 		HAVING count(*) > 1) b
 		ON a.RCITO_LAM = b.RCITO_LAM
-		ORDER BY a.CODPRO";
+		ORDER BY a.RCITO_LAM";
 		$data = $con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
 
-		$sql = "SELECT CODPRO, RCITO_LAM FROM PROTUARIO_PACIENTE WHERE YEAR(DATREG) >= '2019' ORDER BY CODPRO;";
+		$sql = "SELECT CODPRO, RCITO_LAM FROM PROTUARIO_PACIENTE WHERE YEAR(DATREG) >= '2019' ORDER BY RCITO_LAM;";
 		$comp = $con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
 
 		$sql = "";
