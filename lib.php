@@ -9,7 +9,7 @@ class connection {
 		$connectionInfo = array("Database"=>"$database", "UID"=>"$user", "PWD"=>"$pass", "CharacterSet" => "UTF-8");
 		$con = sqlsrv_connect($server, $connectionInfo);
 		$stmt = sqlsrv_query($con, $sql);
-		
+
 		if($stmt === false) {
 			die(print_r(sqlsrv_errors(), true));
 		}
@@ -17,7 +17,7 @@ class connection {
 		while($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
 			$data->append($row);
 		}
-		
+
 		sqlsrv_free_stmt($stmt);
 
 		sqlsrv_close($con);
@@ -457,6 +457,7 @@ class dao {
 		$con = new connection();
 		$logs = new logs();
 		$data = new ArrayObject();
+		$comp = new ArrayObject();
 		$last = new ArrayObject();
 		$content = new ArrayObject();
 
@@ -473,24 +474,43 @@ class dao {
 		FROM PROTUARIO_PACIENTE 
 		WHERE RCITO_LAM IS NOT NULL 
 		AND LEN(RCITO_LAM) > 0 
+		AND YEAR(DATREG) >= '2019'
 		GROUP BY RCITO_LAM
 		HAVING count(*) > 1) b
 		ON a.RCITO_LAM = b.RCITO_LAM
 		ORDER BY a.CODPRO";
 		$data = $con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
 
-		$sql = "SELECT TOP 1 RCITO_LAM FROM PROTUARIO_PACIENTE ORDER BY CODPRO DESC;";
-		$last = $con->connect($this->server, $this->database, $this->user, $this->pass, $sql)[0];
-		$lamPre = substr($last["RCITO_LAM"], 0, 3);
-		$lamSuf = substr($last["RCITO_LAM"], 3, strlen($last["RCITO_LAM"]));
+		$sql = "SELECT CODPRO, RCITO_LAM FROM PROTUARIO_PACIENTE WHERE YEAR(DATREG) >= '2019' ORDER BY CODPRO;";
+		$comp = $con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
 
 		$sql = "";
+		$numb = 0;
+		$valid = null;
 
 		foreach ($data as $val) {
 			if ($val["RCITO_LAM"] == $lastValue) {
 				$index++;
-				$lamSuf++;
-				$newValue = $lamPre . str_pad($lamSuf, 4, "0", STR_PAD_LEFT);
+
+				if ($valid != substr($val["RCITO_LAM"], 0, 3)) {
+					for ($i = 0; count($comp) > $i; $i++) {
+						if (substr($val["RCITO_LAM"], 0, 3) === substr($comp[$i]["RCITO_LAM"], 0, 3)) {
+							if (
+								(int)substr($comp[$i]["RCITO_LAM"], 3, strlen($comp[$i]["RCITO_LAM"])) + 1 != (int)substr($comp[$i+1]["RCITO_LAM"], 3, strlen($comp[$i+1]["RCITO_LAM"]))
+								&& (int)substr($comp[$i]["RCITO_LAM"], 3, strlen($comp[$i]["RCITO_LAM"])) != (int)substr($comp[$i+1]["RCITO_LAM"], 3, strlen($comp[$i+1]["RCITO_LAM"]))
+							) {
+								$numb = (int)substr($comp[$i]["RCITO_LAM"], 3, strlen($comp[$i]["RCITO_LAM"]));
+								$numb++;
+								$newValue = substr($val["RCITO_LAM"], 0, 3) . str_pad($numb, 4, "0", STR_PAD_LEFT);
+							}
+						}
+					}
+				} else {
+					$numb++;
+					$newValue = substr($val["RCITO_LAM"], 0, 3) . str_pad($numb, 4, "0", STR_PAD_LEFT);
+				}
+				$valid = substr($val["RCITO_LAM"], 0, 3);
+
 				$content->append(array("old"=>$val, "new"=>$newValue));
 				$sql = $sql . "UPDATE PROTUARIO_PACIENTE SET RCITO_LAM = '$newValue' WHERE CODPRO = " . $val["CODPRO"] . "; ";
 				if ($index > 300) {
@@ -520,14 +540,14 @@ class dao {
 		$sql = "";
 		$index = 0;
 
-		$aux = file_get_contents('nome do arquivo.txt', true);
+		$aux = file_get_contents('log/RCITO_LAM DUPLICADO - 162801.txt', true);
 		$data = get_object_vars(json_decode($aux));
 
 		foreach($data as $val){
 			$newValue = $val->new;
-			$oldValue = $val->old;
+			$oldValue = $val->old->RCITO_LAM;
 			if($newValue != $oldValue && $newValue != ""){
-				$sql = $sql . "UPDATE CADASTRO_PACIENTE SET CPFPAC = '$oldValue' WHERE CPFPAC = '$newValue'; ";
+				$sql = $sql . "UPDATE PROTUARIO_PACIENTE SET RCITO_LAM = '$oldValue' WHERE CODPRO = '" . $val->old->CODPRO . "'; ";
 			}
 			$index++;
 			if($index > 300){
