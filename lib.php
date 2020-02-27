@@ -465,7 +465,6 @@ class dao {
 		$lamPre = 0;
 		$lamSuf = 0;
 		$newValue = "";
-		$lastValue = 0;
 		$index = 0;
 
 		$sql = "SELECT a.CODPRO, a.RCITO_LAM 
@@ -489,41 +488,37 @@ class dao {
 		$valid = null;
 
 		foreach ($data as $val) {
-			if ($val["RCITO_LAM"] == $lastValue) {
-				$index++;
+			$index++;
 
-				if ($valid != substr($val["RCITO_LAM"], 0, 3)) {
-					for ($i = 0; count($comp) > $i; $i++) {
-						if (substr($val["RCITO_LAM"], 0, 3) === substr($comp[$i]["RCITO_LAM"], 0, 3)) {
-							if (empty($comp[$i+1])) {
-								$numb = (int)substr($comp[$i]["RCITO_LAM"], 3, strlen($comp[$i]["RCITO_LAM"]));
-								$numb++;
-								$newValue = substr($val["RCITO_LAM"], 0, 3) . str_pad($numb, 4, "0", STR_PAD_LEFT);
-							} else if (
-								(int)substr($comp[$i]["RCITO_LAM"], 3, strlen($comp[$i]["RCITO_LAM"])) + 1 != (int)substr($comp[$i+1]["RCITO_LAM"], 3, strlen($comp[$i+1]["RCITO_LAM"]))
-								&& (int)substr($comp[$i]["RCITO_LAM"], 3, strlen($comp[$i]["RCITO_LAM"])) != (int)substr($comp[$i+1]["RCITO_LAM"], 3, strlen($comp[$i+1]["RCITO_LAM"]))
-							) {
-								$numb = (int)substr($comp[$i]["RCITO_LAM"], 3, strlen($comp[$i]["RCITO_LAM"]));
-								$numb++;
-								$newValue = substr($val["RCITO_LAM"], 0, 3) . str_pad($numb, 4, "0", STR_PAD_LEFT);
-							}
+			if ($valid != substr($val["RCITO_LAM"], 0, 3)) {
+				for ($i = 0; count($comp) > $i; $i++) {
+					if (substr($val["RCITO_LAM"], 0, 3) === substr($comp[$i]["RCITO_LAM"], 0, 3)) {
+						if (empty($comp[$i+1])) {
+							$numb = (int)substr($comp[$i]["RCITO_LAM"], 3, strlen($comp[$i]["RCITO_LAM"]));
+							$numb++;
+							$newValue = substr($val["RCITO_LAM"], 0, 3) . str_pad($numb, 4, "0", STR_PAD_LEFT);
+						} else if (
+							(int)substr($comp[$i]["RCITO_LAM"], 3, strlen($comp[$i]["RCITO_LAM"])) + 1 != (int)substr($comp[$i+1]["RCITO_LAM"], 3, strlen($comp[$i+1]["RCITO_LAM"]))
+							&& (int)substr($comp[$i]["RCITO_LAM"], 3, strlen($comp[$i]["RCITO_LAM"])) != (int)substr($comp[$i+1]["RCITO_LAM"], 3, strlen($comp[$i+1]["RCITO_LAM"]))
+						) {
+							$numb = (int)substr($comp[$i]["RCITO_LAM"], 3, strlen($comp[$i]["RCITO_LAM"]));
+							$numb++;
+							$newValue = substr($val["RCITO_LAM"], 0, 3) . str_pad($numb, 4, "0", STR_PAD_LEFT);
 						}
 					}
-				} else {
-					$numb++;
-					$newValue = substr($val["RCITO_LAM"], 0, 3) . str_pad($numb, 4, "0", STR_PAD_LEFT);
-				}
-				$valid = substr($val["RCITO_LAM"], 0, 3);
-
-				$content->append(array("old"=>$val, "new"=>$newValue));
-				$sql = $sql . "UPDATE PROTUARIO_PACIENTE SET RCITO_LAM = '$newValue' WHERE CODPRO = " . $val["CODPRO"] . "; ";
-				if ($index > 300) {
-					$con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
-					$sql = "";
-					$index = 0;
 				}
 			} else {
-				$lastValue = $val["RCITO_LAM"];
+				$numb++;
+				$newValue = substr($val["RCITO_LAM"], 0, 3) . str_pad($numb, 4, "0", STR_PAD_LEFT);
+			}
+			$valid = substr($val["RCITO_LAM"], 0, 3);
+
+			$content->append(array("old"=>$val, "new"=>$newValue));
+			$sql = $sql . "UPDATE PROTUARIO_PACIENTE SET RCITO_LAM = '$newValue' WHERE CODPRO = " . $val["CODPRO"] . "; ";
+			if ($index > 300) {
+				$con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
+				$sql = "";
+				$index = 0;
 			}
 		}
 		$con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
@@ -544,7 +539,7 @@ class dao {
 		$sql = "";
 		$index = 0;
 
-		$aux = file_get_contents('log/RCITO_LAM DUPLICADO - 162801.txt', true);
+		$aux = file_get_contents('log/test.txt', true);
 		$data = get_object_vars(json_decode($aux));
 
 		foreach($data as $val){
