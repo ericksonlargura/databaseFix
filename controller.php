@@ -58,6 +58,11 @@ if ($_POST['verify'] == 0) { //Tela inicial
 				$_SESSION['alert'] = "Banco de dados atualizado!";
 				break;
 			case 10:
+				$dao->moveImageDirNames();
+				$_SESSION['page'] = 0;
+				$_SESSION['alert'] = "Banco de dados atualizado!";
+				break;
+			case 11:
 				$dao->fixDuplicateSheets();
 				$_SESSION['page'] = 0;
 				$_SESSION['alert'] = "Banco de dados atualizado!";

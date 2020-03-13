@@ -450,6 +450,37 @@ class dao {
 
 	}
 
+	function moveImageDirNames(){
+
+		set_time_limit(10000);
+
+		$con = new connection();
+		$data = new ArrayObject();
+
+		$sql = "SELECT * FROM IMAGENS_PRONTUARIO;";
+		$data = $con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
+
+		$sql = "";
+		$index = 0;
+		$imageName = "";
+		$cod = 0;
+		foreach($data as $val){
+			$imageName = $val['DIRANO'] . '\\' . $val['DIRIMA'];
+			$cod = $val['CODID'];
+			$sql = $sql . "UPDATE EVOLUCAO SET IMGEVO = '$imageName' WHERE CODEVO = $cod; ";
+			$index++;
+			if($index > 300){
+				$con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
+				$sql = "";
+				$index = 0;
+			}
+		}
+		$con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
+
+		return "ok";
+
+	}
+
 	function fixDuplicateSheets(){
 
 		set_time_limit(10000);
