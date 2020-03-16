@@ -457,7 +457,7 @@ class dao {
 		$con = new connection();
 		$data = new ArrayObject();
 
-		$sql = "SELECT * FROM IMAGENS_PRONTUARIO;";
+		$sql = "SELECT CODEVO, YEAR(DATREG) AS DATREG, EVOPAC FROM EVOLUCAO WHERE EVOPAC LIKE '%pdf';";
 		$data = $con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
 
 		$sql = "";
@@ -465,8 +465,8 @@ class dao {
 		$imageName = "";
 		$cod = 0;
 		foreach($data as $val){
-			$imageName = $val['DIRANO'] . '\\' . $val['DIRIMA'];
-			$cod = $val['CODID'];
+			$imageName = $val['DATREG'] . '/' . $val['EVOPAC'];
+			$cod = $val['CODEVO'];
 			$sql = $sql . "UPDATE EVOLUCAO SET IMGEVO = '$imageName' WHERE CODEVO = $cod; ";
 			$index++;
 			if($index > 300){
