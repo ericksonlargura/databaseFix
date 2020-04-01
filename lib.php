@@ -322,7 +322,7 @@ class dao {
 		$cont = array(
 			"CREATE TABLE CIDADE (CODCID int IDENTITY(1,1) PRIMARY KEY,NOMCID varchar(50)); ",
 			"CREATE TABLE BAIRROS (CODBAI int IDENTITY(1,1) PRIMARY KEY,CODCID int null,NOMBAI varchar(50)); ",
-			"CREATE TABLE MOVIMENTO_FINANCEIRO (COD_MOV int NOT NULL PRIMARY KEY,COD_LAN int,STA_LAN varchar(255),USUALT varchar(255),DATALT varchar(255),TIPMOV varchar(255),VLRLAN varchar(255),VLRDES varchar(255),VLRMUL varchar(255),VLRJUR varchar(255),VLRTOT varchar(255),SEQMOV varchar(255),TIPLAN varchar(255),SEQTIT varchar(255)); ",
+			"CREATE TABLE MOVIMENTO_FINANCEIRO (COD_MOV int PRIMARY KEY IDENTITY(1,1) NOT NULL,COD_LAN int,STA_LAN varchar(255),USUALT varchar(255),DATALT varchar(255),TIPMOV varchar(255),VLRLAN varchar(255),VLRDES varchar(255),VLRMUL varchar(255),VLRJUR varchar(255),VLRTOT varchar(255),SEQMOV varchar(255),TIPLAN varchar(255),SEQTIT varchar(255)); ",
 			"CREATE TABLE AGENDA (CODAGE int NOT NULL PRIMARY KEY,DATINI varchar(255),DATFIM varchar(255),CODPAC varchar(255),NOMPAC varchar(255),CONPAC varchar(255),STATUS varchar(255),TIPAGE varchar(255)); ",
 			"CREATE TABLE ESTOQUE (CODEMP int NOT NULL,CODFIL int NOT NULL,CODDEP varchar(50) NOT NULL,CODPRO varchar(50) NOT NULL,CODEST INT NOT NULL IDENTITY(1,1),DESPRO varchar(250) NULL,QTDEST decimal(18, 5) NULL,UNIMED varchar(50) NULL,VLRCOM decimal(18, 2) NULL,VLRVEN decimal(18, 2) NULL,VLRTCO decimal(18, 2) NULL,VLRTVE decimal(18, 2) NULL,CODAGR int NULL,SITPRO varchar(1) NOT NULL, PRIMARY KEY(CODEMP,CODFIL,CODDEP,CODPRO,CODEST)); ",
 			"CREATE TABLE ESTOQUE_MOVIMENTO (CODEMP int NOT NULL,CODFIL int NOT NULL,CODDEP varchar(50) NOT NULL,CODPRO varchar(50) NOT NULL,CODEST int NOT NULL ,SEQMOV int IDENTITY(1,1) NOT NULL,TIPMOV varchar(1) NULL,QTDMOV decimal(18, 5) NULL,QTDANT decimal(18, 5) NULL,QTDEST decimal(18, 5) NULL,VLRMED decimal(18, 2) NULL,VLRMOV decimal(18, 2) NULL,PERIPI decimal(18, 2) NULL,PERICM decimal(18, 2) NULL,PERISS decimal(18, 2) NULL,DATREG datetime NULL,USUREG varchar(50) NULL,OBSMOV varchar(250) NULL,NUMDOC int NULL,EMIDOC datetime NULL,CHADOC varchar(150) NULL,CODSNF varchar(50) NULL,CODFOR int NULL,CODCLI int NULL, PRIMARY KEY(CODEMP, CODFIL, CODDEP, CODPRO, CODEST)); ",
@@ -555,6 +555,92 @@ class dao {
 		$con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
 
 		$logs->saveLog("RCITO_LAM DUPLICADO", json_encode($content));
+
+		return "ok";
+
+	}
+
+	function migrateFinancial(){
+
+		set_time_limit(10000);
+
+		$con = new connection();
+		$tiplan = new ArrayObject();
+		$indpgt = new ArrayObject();
+		$data = new ArrayObject();
+
+		$sql = "SELECT * FROM LANCAMENTO_FINANCEIRO WHERE TIPLAN = 'C';";
+		$tiplan = $con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
+		if (count($tiplan) > 0) {
+			$sql = "UPDATE LANCAMENTO_FINANCEIRO SET TIPLAN = 'R' WHERE TIPLAN = 'C';";
+			$con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
+		}
+
+		$sql = "SELECT * FROM LANCAMENTO_FINANCEIRO WHERE INDPGT = 'S';";
+		$indpgt = $con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
+		if (count($indpgt) > 0) {
+			$sql = "UPDATE LANCAMENTO_FINANCEIRO SET INDPGT = 'A' WHERE INDPGT = 'S';";
+			$con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
+		}
+
+		$sql = "SELECT * FROM LANCAMENTO_FINANCEIRO WHERE INDPGT = 'N';";
+		$indpgt = $con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
+		if (count($indpgt) > 0) {
+			$sql = "UPDATE LANCAMENTO_FINANCEIRO SET INDPGT = 'A' WHERE INDPGT = 'N';";
+			$con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
+		}
+
+		$sql = "SELECT * FROM LANCAMENTO_FINANCEIRO;";
+		$data = $con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
+
+		$sql = "";
+		$index = 0;
+		foreach($data as $val){
+			$sql = $sql . "INSERT INTO MOVIMENTO_FINANCEIRO (
+				COD_LAN, STA_LAN, USUALT, DATALT, TIPMOV, VLRLAN, VLRDES, VLRMUL, VLRJUR, VLRTOT, SEQMOV, TIPLAN, SEQTIT
+			) VALUES (
+				'" . $val['NUMTIL'] . "',
+				NULL,
+				'" . $val['USUGER'] . "',
+				'" . $val['DATGER']->format('d-m-Y') . "',
+				'01',
+				'" . str_replace(',', '', number_format($val['VLRLAN'], 2, '.', ',')) . "',
+				'0',
+				'0',
+				'0',
+				'" . str_replace(',', '', number_format($val['VLRLAN'], 2, '.', ',')) . "',
+				'1',
+				'" . $val['TIPLAN'] . "',
+				NULL
+			); INSERT INTO MOVIMENTO_FINANCEIRO (
+				COD_LAN, STA_LAN, USUALT, DATALT, TIPMOV, VLRLAN, VLRDES, VLRMUL, VLRJUR, VLRTOT, SEQMOV, TIPLAN, SEQTIT
+			) VALUES (
+				'" . $val['NUMTIL'] . "',
+				NULL,
+				'" . $val['USUGER'] . "',
+				'" . $val['DATGER']->format('d-m-Y') . "',
+				'02',
+				'" . str_replace(',', '', number_format($val['VLRLAN'], 2, '.', ',')) . "',
+				'0',
+				'0',
+				'0',
+				'" . str_replace(',', '', number_format($val['VLRLAN'], 2, '.', ',')) . "',
+				'2',
+				'" . $val['TIPLAN'] . "',
+				NULL
+			); UPDATE LANCAMENTO_FINANCEIRO SET 
+				VLRLAN = '" . str_replace(',', '', number_format($val['VLRLAN'], 2, '.', ',')) . "', 
+				VLRTOT = '" . str_replace(',', '', number_format($val['VLRLAN'], 2, '.', ',')) . "', 
+				RESPAG = '0' 
+			WHERE NUMTIL = " . $val['NUMTIL'] . ";";
+			if($index > 300){
+				$con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
+				$sql = "";
+				$index = 0;
+			}
+			$index++;
+		}
+		$con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
 
 		return "ok";
 
