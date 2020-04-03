@@ -68,6 +68,11 @@ if ($_POST['verify'] == 0) { //Tela inicial
 				$_SESSION['alert'] = "Banco de dados atualizado!";
 				break;
 			case 12:
+				$dao->migrateProviders();
+				$_SESSION['page'] = 0;
+				$_SESSION['alert'] = "Banco de dados atualizado!";
+				break;
+			case 13:
 				$dao->migrateFinancial();
 				$_SESSION['page'] = 0;
 				$_SESSION['alert'] = "Banco de dados atualizado!";

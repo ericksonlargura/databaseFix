@@ -131,7 +131,8 @@ session_start();
 										<option value="9">Mover imagens de IMAGENS_PRONTUARIO para EVOLUCAO</option>
 										<option value="10">Mover imagens de IMAGENS_PRONTUARIO para EVOLUCAO (GASPAR)</option>
 										<option value="11">Corrigir lâminas duplicadas</option>
-										<option value="12">Migrar financeiro</option>
+										<option value="12">Migrar fornecedores (antes de financeiro)</option>
+										<option value="13">Migrar financeiro</option>
 										<option value="99">Rollback (Necessário configurar no php)</option>
 									</select>
 								</div>

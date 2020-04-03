@@ -560,6 +560,60 @@ class dao {
 
 	}
 
+	function migrateProviders(){
+		
+		set_time_limit(10000);
+
+		$con = new connection();
+		$data = new ArrayObject();
+
+		$sql = "SELECT * FROM CADASTRO_CLIENTE WHERE TipCad = 'Cadastro Fornecedor' OR TipCad = 'Ambos';";
+		$data = $con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
+
+		$sql = "";
+		$index = 0;
+		foreach($data as $val){
+			$sql = $sql . "INSERT INTO CADASTRO_FORNECEDORES (
+				CodFor, NomFor, ApeFor, SenFor, TipFor, CodRam, InsEst, InsMun, CgcCpf, EndFor, CplFor, NumEnd, BaiFor, SigUfs, FonFor, FonCl2, FonCl3, EmaFor, DatHor, UsuCad, SitFor, ObsFor, CepFor
+			) VALUES (
+				" . ((!is_null($val['CodCli'])) ? "'" . $val['CodCli'] . "'" : "NULL") . ",
+				" . ((!is_null($val['NomCli'])) ? "'" . $val['NomCli'] . "'" : "NULL") . ",
+				" . ((!is_null($val['ApeCli'])) ? "'" . $val['ApeCli'] . "'" : "NULL") . ",
+				" . ((!is_null($val['SenCli'])) ? "'" . $val['SenCli'] . "'" : "NULL") . ",
+				" . ((!is_null($val['TipCli'])) ? "'" . $val['TipCli'] . "'" : "NULL") . ",
+				" . ((!is_null($val['CodRam'])) ? "'" . $val['CodRam'] . "'" : "NULL") . ",
+				" . ((!is_null($val['InsEst'])) ? "'" . $val['InsEst'] . "'" : "NULL") . ",
+				" . ((!is_null($val['InsMun'])) ? "'" . $val['InsMun'] . "'" : "NULL") . ",
+				" . ((!is_null($val['CgcCpf'])) ? "'" . $val['CgcCpf'] . "'" : "NULL") . ",
+				" . ((!is_null($val['EndCli'])) ? "'" . $val['EndCli'] . "'" : "NULL") . ",
+				" . ((!is_null($val['CplCli'])) ? "'" . $val['CplCli'] . "'" : "NULL") . ",
+				" . ((!is_null($val['NumEnd'])) ? "'" . $val['NumEnd'] . "'" : "NULL") . ",
+				" . ((!is_null($val['BaiCli'])) ? "'" . $val['BaiCli'] . "'" : "NULL") . ",
+				" . ((!is_null($val['SigUfs'])) ? "'" . $val['SigUfs'] . "'" : "NULL") . ",
+				" . ((!is_null($val['CliCli'])) ? "'" . $val['CliCli'] . "'" : "NULL") . ",
+				" . ((!is_null($val['FonCli'])) ? "'" . $val['FonCli'] . "'" : "NULL") . ",
+				" . ((!is_null($val['FonCl2'])) ? "'" . $val['FonCl2'] . "'" : "NULL") . ",
+				" . ((!is_null($val['EmaCli'])) ? "'" . $val['EmaCli'] . "'" : "NULL") . ",
+				" . ((!is_null($val['DatHor'])) ? "'" . $val['DatHor']->format("Y-m-d H:i:s") . "'" : "NULL") . ",
+				" . ((!is_null($val['UsuCad'])) ? "'" . $val['UsuCad'] . "'" : "NULL") . ",
+				" . ((!is_null($val['SitCli'])) ? "'" . $val['SitCli'] . "'" : "NULL") . ",
+				" . ((!is_null($val['ObsCli'])) ? "'" . $val['ObsCli'] . "'" : "NULL") . ",
+				" . ((!is_null($val['CepCli'])) ? "'" . $val['CepCli'] . "'" : "NULL") . "
+			); ";
+			if($index > 300){
+				exit($sql);
+				$con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
+				$sql = "";
+				$index = 0;
+			}
+			$index++;
+		}
+		$con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
+
+		return "ok";
+
+	}
+
 	function migrateFinancial(){
 
 		set_time_limit(10000);
@@ -599,40 +653,40 @@ class dao {
 			$sql = $sql . "INSERT INTO MOVIMENTO_FINANCEIRO (
 				COD_LAN, STA_LAN, USUALT, DATALT, TIPMOV, VLRLAN, VLRDES, VLRMUL, VLRJUR, VLRTOT, SEQMOV, TIPLAN, SEQTIT
 			) VALUES (
-				'" . $val['NUMTIL'] . "',
+				" . ((!is_null($val['NUMTIL'])) ? "'" . $val['NUMTIL'] . "'" : "NULL") . ",
 				NULL,
-				'" . $val['USUGER'] . "',
-				'" . $val['DATGER']->format('d-m-Y') . "',
+				" . ((!is_null($val['USUGER'])) ? "'" . $val['USUGER'] . "'" : "NULL") . ",
+				" . ((!is_null($val['DATGER'])) ? "'" . $val['DATGER']->format('d-m-Y') . "'" : 'NULL') . ",
 				'01',
-				'" . str_replace(',', '', number_format($val['VLRLAN'], 2, '.', ',')) . "',
+				" . ((!is_null($val['VLRLAN'])) ? "'" . str_replace(',', '', number_format($val['VLRLAN'], 2, '.', ',')) . "'" : "NULL") . ",
 				'0',
 				'0',
 				'0',
-				'" . str_replace(',', '', number_format($val['VLRLAN'], 2, '.', ',')) . "',
+				" . ((!is_null($val['VLRLAN'])) ? "'" . str_replace(',', '', number_format($val['VLRLAN'], 2, '.', ',')) . "'" : "NULL") . ",
 				'1',
-				'" . $val['TIPLAN'] . "',
+				" . ((!is_null($val['TIPLAN'])) ? "'" . $val['TIPLAN'] . "'" : "NULL") . ",
 				NULL
 			); INSERT INTO MOVIMENTO_FINANCEIRO (
 				COD_LAN, STA_LAN, USUALT, DATALT, TIPMOV, VLRLAN, VLRDES, VLRMUL, VLRJUR, VLRTOT, SEQMOV, TIPLAN, SEQTIT
 			) VALUES (
-				'" . $val['NUMTIL'] . "',
+				" . ((!is_null($val['NUMTIL'])) ? "'" . $val['NUMTIL'] . "'" : "NULL") . ",
 				NULL,
-				'" . $val['USUGER'] . "',
-				'" . $val['DATGER']->format('d-m-Y') . "',
+				" . ((!is_null($val['USUGER'])) ? "'" . $val['USUGER'] . "'" : "NULL") . ",
+				" . ((!is_null($val['DATGER'])) ? "'" . $val['DATGER']->format('d-m-Y') . "'" : 'NULL') . ",
 				'02',
-				'" . str_replace(',', '', number_format($val['VLRLAN'], 2, '.', ',')) . "',
+				" . ((!is_null($val['VLRLAN'])) ? "'" . str_replace(',', '', number_format($val['VLRLAN'], 2, '.', ',')) . "'" : "NULL") . ",
 				'0',
 				'0',
 				'0',
-				'" . str_replace(',', '', number_format($val['VLRLAN'], 2, '.', ',')) . "',
+				" . ((!is_null($val['VLRLAN'])) ? "'" . str_replace(',', '', number_format($val['VLRLAN'], 2, '.', ',')) . "'" : "NULL") . ",
 				'2',
-				'" . $val['TIPLAN'] . "',
+				" . ((!is_null($val['TIPLAN'])) ? "'" . $val['TIPLAN'] . "'" : "NULL") . ",
 				NULL
 			); UPDATE LANCAMENTO_FINANCEIRO SET 
 				VLRLAN = '" . str_replace(',', '', number_format($val['VLRLAN'], 2, '.', ',')) . "', 
 				VLRTOT = '" . str_replace(',', '', number_format($val['VLRLAN'], 2, '.', ',')) . "', 
 				RESPAG = '0' 
-			WHERE NUMTIL = " . $val['NUMTIL'] . ";";
+			WHERE NUMTIL = " . $val['NUMTIL'] . "; ";
 			if($index > 300){
 				$con->connect($this->server, $this->database, $this->user, $this->pass, $sql);
 				$sql = "";
